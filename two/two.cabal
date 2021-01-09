@@ -1,0 +1,69 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 2a64eac2adeb6377ac6365844899c7b0e816e8c4883e1030d2cd7b54b0007232
+
+name:           two
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/JohnDoneth/advent-of-code-2020#readme>
+homepage:       https://github.com/githubuser/one#readme
+bug-reports:    https://github.com/githubuser/one/issues
+author:         John Doneth
+maintainer:     doneth7@gmail.com
+copyright:      2021 John Doneth
+license:        BSD3
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/one
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_two
+  hs-source-dirs:
+      src
+  build-depends:
+      HUnit
+    , base >=4.7 && <5
+    , flow
+    , parsec
+  default-language: Haskell2010
+
+executable two-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_two
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      HUnit
+    , base >=4.7 && <5
+    , flow
+    , parsec
+    , two
+  default-language: Haskell2010
+
+test-suite two-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_two
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      HUnit
+    , base >=4.7 && <5
+    , flow
+    , parsec
+    , two
+  default-language: Haskell2010
