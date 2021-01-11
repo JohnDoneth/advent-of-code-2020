@@ -1,0 +1,75 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: a44668acda2c2b5c2907d1dbbd0d3f947fce91ad073f6946df754713249fd5c7
+
+name:           four
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/JohnDoneth/advent-of-code-2020#readme>
+homepage:       https://github.com/JohnDoneth/four#readme
+bug-reports:    https://github.com/JohnDoneth/four/issues
+author:         John Doneth
+maintainer:     doneth7@gmail.com
+copyright:      2021 John Doneth
+license:        BSD3
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/JohnDoneth/four
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_four
+  hs-source-dirs:
+      src
+  build-depends:
+      HUnit
+    , base >=4.7 && <5
+    , flow
+    , hashable
+    , parsec
+    , unordered-containers
+  default-language: Haskell2010
+
+executable four-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_four
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      HUnit
+    , base >=4.7 && <5
+    , flow
+    , four
+    , hashable
+    , parsec
+    , unordered-containers
+  default-language: Haskell2010
+
+test-suite four-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_four
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      HUnit
+    , base >=4.7 && <5
+    , flow
+    , four
+    , hashable
+    , parsec
+    , unordered-containers
+  default-language: Haskell2010
