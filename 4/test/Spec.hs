@@ -1,11 +1,20 @@
 import GHC.Base (assert)
-import Lib (isValidPassportS)
+import Lib
 import Test.HUnit
 import Text.Parsec
 
 main :: IO ()
 main = do
-  runTestTT tests
+  runTestTT
+    ( TestList
+        [ tests,
+          heightParsingTests,
+          birthYearTests,
+          hairColorTests,
+          eyeColorTests,
+          passportIDTests
+        ]
+    )
   return ()
 
 tests =
@@ -23,3 +32,41 @@ assertValid input =
 assertInvalid :: String -> Test
 assertInvalid input =
   TestCase (assertEqual "" False (isValidPassportS input))
+
+birthYearTests :: Test
+birthYearTests =
+  TestList
+    [ TestCase (assertEqual "" True (sValidateBirthYear "2002")),
+      TestCase (assertEqual "" False (sValidateBirthYear "2003"))
+    ]
+
+heightParsingTests :: Test
+heightParsingTests =
+  TestList
+    [ TestCase (assertEqual "" True (sValidateHeight "60in")),
+      TestCase (assertEqual "" True (sValidateHeight "190cm")),
+      TestCase (assertEqual "" False (sValidateHeight "190in")),
+      TestCase (assertEqual "" False (sValidateHeight "190"))
+    ]
+
+hairColorTests :: Test
+hairColorTests =
+  TestList
+    [ TestCase (assertEqual "" True (sValidateBirthYear "#123abc")),
+      TestCase (assertEqual "" False (sValidateBirthYear "#123abz")),
+      TestCase (assertEqual "" False (sValidateBirthYear "123abc"))
+    ]
+
+eyeColorTests :: Test
+eyeColorTests =
+  TestList
+    [ TestCase (assertEqual "" True (sValidateEyeColor "brn")),
+      TestCase (assertEqual "" False (sValidateEyeColor "wat"))
+    ]
+
+passportIDTests :: Test
+passportIDTests =
+  TestList
+    [ TestCase (assertEqual "" True (sValidatePassportID "000000001")),
+      TestCase (assertEqual "" False (sValidatePassportID "0123456789"))
+    ]

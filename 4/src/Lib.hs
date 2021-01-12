@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Lib
   ( isValidPassport,
@@ -11,12 +12,17 @@ module Lib
     passportParser,
     twoNewLines,
     fieldValueParser,
+    sValidateHeight,
+    sValidateBirthYear,
+    sValidateHairColor,
+    sValidateEyeColor,
+    sValidatePassportID,
     Passport,
   )
 where
 
 import Control.Monad (liftM2, void)
-import Data.HashSet
+import Data.HashMap.Strict
 import Data.Hashable
 import Debug.Trace
 import Flow ((|>))
@@ -55,7 +61,7 @@ newtype HexColor = HexColor String deriving (Show, Eq)
 --   }
 --   deriving (Show, Eq)
 
-newtype Passport = Passport (HashSet PassportFieldTag)
+newtype Passport = Passport (HashMap PassportFieldTag String)
   deriving (Show)
 
 -- hexParser :: Parser Color
@@ -82,16 +88,6 @@ data PassportFieldTag
   deriving stock (Show, Eq, Generic)
   deriving anyclass (Hashable)
 
--- data PassportField
---   = BirthYear Int
---   | IssueYear Int
---   | ExpirationYear Int
---   | Height Height
---   | HairColor HexColor
---   | EyeColor EyeColor
---   | PassportID String
---   | CountryID
-
 fieldTagParser :: Parser PassportFieldTag
 fieldTagParser =
   try (const BirthYear <$> string "byr")
@@ -103,17 +99,15 @@ fieldTagParser =
     <|> try (const PassportID <$> string "pid")
     <|> try (const CountryID <$> string "cid")
 
-fieldParser :: Parser PassportFieldTag
+fieldParser :: Parser (PassportFieldTag, String)
 fieldParser = do
   tag <- fieldTagParser
   _ <- char ':'
   value <- fieldValueParser
-  return tag
+  return (tag, value)
 
-fieldValueParser :: Parser ()
-fieldValueParser = do
-  _ <- many1 (try (choice [alphaNum, char '#']))
-  return ()
+fieldValueParser :: Parser String
+fieldValueParser = many1 (try (choice [alphaNum, char '#']))
 
 passportListParser :: Parser [Passport]
 passportListParser = endBy passportParser singleNewLine
@@ -167,3 +161,66 @@ requiredFields =
     EyeColor,
     PassportID
   ]
+
+validatePassportBirthYear :: Passport -> Bool
+validatePassportBirthYear (Passport map) =
+  case Data.HashMap.Strict.lookup BirthYear map of
+    Just a ->
+      case parse yearParser "" a of
+        Left failed -> False
+        Right year -> True
+    Nothing -> False
+
+stringToYear :: String -> Maybe Int
+stringToYear input =
+  case parse yearParser "" input of
+    Left failed -> Nothing
+    Right year -> Just year
+
+yearParser :: Parser Int
+yearParser = fmap read (count 4 digit)
+
+validateBirthYear :: Int -> Bool
+validateBirthYear v = v >= 1920 && v <= 2002
+
+sValidateBirthYear :: String -> Bool
+sValidateBirthYear input = False
+
+validateIssueYear :: Int -> Bool
+validateIssueYear v = v >= 2010 && v <= 2020
+
+validateExpirationYear :: Int -> Bool
+validateExpirationYear v = v >= 2020 && v <= 2030
+
+sValidateHeight :: String -> Bool
+sValidateHeight input =
+  case parse heightParser "" input of
+    Left error -> False
+    Right height -> validateHeight height
+
+heightParser :: Parser Height
+heightParser = do
+  value <- manyTill digit (lookAhead (oneOf ['i', 'c']))
+  chars <- choice [string "in", string "cm"]
+  return
+    ( case chars of
+        "in" -> Inches (read value)
+        "cm" -> Centimeters (read value)
+    )
+
+validateHeight :: Height -> Bool
+validateHeight (Centimeters cm) = cm >= 150 && cm <= 193
+validateHeight (Inches inches) = inches >= 59 && inches <= 76
+
+sValidateEyeColor :: String -> Bool
+sValidateEyeColor color =
+  color `elem` ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
+
+sValidateHairColor :: String -> Bool
+sValidateHairColor input = False
+
+sValidatePassportID :: String -> Bool
+sValidatePassportID input = False
+
+sValidateCountryID :: String -> Bool
+sValidateCountryID input = False
