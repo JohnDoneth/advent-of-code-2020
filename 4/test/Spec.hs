@@ -52,9 +52,9 @@ heightParsingTests =
 hairColorTests :: Test
 hairColorTests =
   TestList
-    [ TestCase (assertEqual "" True (sValidateBirthYear "#123abc")),
-      TestCase (assertEqual "" False (sValidateBirthYear "#123abz")),
-      TestCase (assertEqual "" False (sValidateBirthYear "123abc"))
+    [ TestCase (assertEqual "" True (sValidateHairColor "#123abc")),
+      TestCase (assertEqual "" False (sValidateHairColor "#123abz")),
+      TestCase (assertEqual "" False (sValidateHairColor "123abc"))
     ]
 
 eyeColorTests :: Test

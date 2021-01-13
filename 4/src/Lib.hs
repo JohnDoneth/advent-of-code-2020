@@ -17,11 +17,13 @@ module Lib
     sValidateHairColor,
     sValidateEyeColor,
     sValidatePassportID,
+    validatePassport,
     Passport,
   )
 where
 
 import Control.Monad (liftM2, void)
+import Data.Either
 import Data.HashMap.Strict
 import Data.Hashable
 import Debug.Trace
@@ -162,14 +164,36 @@ requiredFields =
     PassportID
   ]
 
-validatePassportBirthYear :: Passport -> Bool
-validatePassportBirthYear (Passport map) =
-  case Data.HashMap.Strict.lookup BirthYear map of
+validatePassport :: Passport -> Bool
+validatePassport passport =
+  validatePassportFields
+    passport
+    [ (BirthYear, sValidateBirthYear),
+      (IssueYear, sValidateIssueYear),
+      (ExpirationYear, sValidateExpirationYear),
+      (Height, sValidateHeight),
+      (HairColor, sValidateHairColor),
+      (EyeColor, sValidateEyeColor),
+      (PassportID, sValidatePassportID)
+    ]
+
+validatePassportFields :: Passport -> [(PassportFieldTag, String -> Bool)] -> Bool
+validatePassportFields (Passport map) [] = True
+validatePassportFields (Passport map) ((tag, mapper) : xs) =
+  case Data.HashMap.Strict.lookup tag map of
     Just a ->
-      case parse yearParser "" a of
-        Left failed -> False
-        Right year -> True
+      if mapper a
+        then validatePassportFields (Passport map) xs
+        else False
     Nothing -> False
+
+-- validatePassportBirthYear (Passport map) =
+--   case Data.HashMap.Strict.lookup BirthYear map of
+--     Just a ->
+--       case parse yearParser "" a of
+--         Left failed -> False
+--         Right year -> True
+--     Nothing -> False
 
 stringToYear :: String -> Maybe Int
 stringToYear input =
@@ -184,13 +208,22 @@ validateBirthYear :: Int -> Bool
 validateBirthYear v = v >= 1920 && v <= 2002
 
 sValidateBirthYear :: String -> Bool
-sValidateBirthYear input = False
+sValidateBirthYear input =
+  maybe False validateBirthYear (stringToYear input)
 
 validateIssueYear :: Int -> Bool
 validateIssueYear v = v >= 2010 && v <= 2020
 
+sValidateIssueYear :: String -> Bool
+sValidateIssueYear input =
+  maybe False validateIssueYear (stringToYear input)
+
 validateExpirationYear :: Int -> Bool
 validateExpirationYear v = v >= 2020 && v <= 2030
+
+sValidateExpirationYear :: String -> Bool
+sValidateExpirationYear input =
+  maybe False validateExpirationYear (stringToYear input)
 
 sValidateHeight :: String -> Bool
 sValidateHeight input =
@@ -217,10 +250,15 @@ sValidateEyeColor color =
   color `elem` ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
 
 sValidateHairColor :: String -> Bool
-sValidateHairColor input = False
+sValidateHairColor input =
+  let parser = do
+        _ <- char '#'
+        count 6 hexDigit
+   in parse parser "" input |> isRight
 
 sValidatePassportID :: String -> Bool
-sValidatePassportID input = False
-
-sValidateCountryID :: String -> Bool
-sValidateCountryID input = False
+sValidatePassportID input =
+  let parser = do
+        _ <- count 9 digit
+        notFollowedBy digit
+   in parse parser "" input |> isRight

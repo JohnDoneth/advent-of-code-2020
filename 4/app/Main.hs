@@ -19,7 +19,7 @@ parsePassports input =
     Right passports -> return passports
 
 verifyPassports :: [Passport] -> [Bool]
-verifyPassports = fmap isValidPassport
+verifyPassports = fmap (\p -> isValidPassport p && validatePassport p)
 
 countValid :: [Bool] -> Int
 countValid bools = filter (== True) bools |> length
