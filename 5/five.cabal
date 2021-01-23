@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 89d73739b5de7359250ec373d6d4e42b1488aa148bc582718c43a3d0f3ed8a3f
+-- hash: 560043c29233843e7b838592849740bed6ff81fb80a9cd42b04004a738adafee
 
 name:           five
 version:        0.1.0.0
@@ -35,7 +35,9 @@ library
     , base >=4.7 && <5
     , flow
     , hashable
+    , lens
     , parsec
+    , sort
     , unordered-containers
   default-language: Haskell2010
 
@@ -52,7 +54,9 @@ executable five-exe
     , five
     , flow
     , hashable
+    , lens
     , parsec
+    , sort
     , unordered-containers
   default-language: Haskell2010
 
@@ -70,6 +74,8 @@ test-suite five-test
     , five
     , flow
     , hashable
+    , lens
     , parsec
+    , sort
     , unordered-containers
   default-language: Haskell2010

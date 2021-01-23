@@ -52,6 +52,7 @@ choiceListParser = do
   col <- count 3 choiceParser
   return (row, col)
 
+-- (seatRow row, seatColumn col, uniqueSeatID)
 solver :: String -> (Int, Int, Int)
 solver input =
   case parse choiceListParser "" input of
@@ -62,13 +63,9 @@ solver input =
         sr = seatRow row
         sc = seatColumn col
 
---(seatRow row, seatColumn col, uniqueSeatID)
 
 seatRow :: [Choice] -> Int
 seatRow choices = decisions choices (0, 127) |> fst
 
 seatColumn :: [Choice] -> Int
 seatColumn choices = decisions choices (0, 7) |> fst
-
--- charParser :: Parser
--- char
